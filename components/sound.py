@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QLabel, QWidget, QComboBox, QSlider, QPushButton, QM
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt, QTimer
 
+
 class SoundManager:
     def __init__(self, parent):
         self.parent = parent
@@ -233,6 +234,7 @@ class SoundManager:
     def refresh_state(self):
         self.update_slider(self.audio_dropdown, self.audio_slider, is_sink=True)
         self.update_slider(self.mic_dropdown, self.mic_slider, is_sink=False)
+        self.refresh_playback_sliders()
 
     def update_slider(self, dropdown, slider, is_sink):
         item = dropdown.currentData()
@@ -247,6 +249,53 @@ class SoundManager:
                 slider.blockSignals(True)
                 slider.setValue(vol)
                 slider.blockSignals(False)
+
+    def get_playback_clients(self):
+        output = self.run_cmd("pactl list sink-inputs")
+        clients, current = [], {}
+        for line in output.splitlines():
+            line = line.strip()
+            if line.startswith("Sink Input #"):
+                if current: clients.append(current)
+                current = {"index": line.split("#")[1]}
+            elif line.startswith("application.name"):
+                match = re.search(r'"([^"]+)"', line)
+                if match: current["name"] = match.group(1)
+            elif line.startswith("Volume:"):
+                match = re.findall(r'(\d+)%', line)
+                if match:
+                    volumes = list(map(int, match))
+                    avg_volume = sum(volumes) // len(volumes)
+                    current["volume"] = avg_volume
+        if current: clients.append(current)
+        return clients
+
+    def refresh_playback_sliders(self):
+        for slider, label in self.playback_sliders:
+            slider.deleteLater()
+            label.deleteLater()
+        self.playback_sliders.clear()
+
+        y = 320
+        font = QFont("ElysiaOSNew", 13)
+        for client in self.get_playback_clients():
+            label = QLabel(client.get("name", f"App {client['index']}"), self.sound_box)
+            label.setFont(font)
+            label.setStyleSheet("color: white; background: transparent; border: none; margin: 0px; padding: 0px")
+            label.move(10, y)
+
+            slider = QSlider(Qt.Orientation.Horizontal, self.sound_box)
+            slider.setGeometry(150, y, 400, 25)
+            slider.setMinimum(0)
+            slider.setMaximum(100)
+            slider.setValue(client["volume"])
+            slider.setStyleSheet(self.slider_style())
+            slider.valueChanged.connect(lambda val, idx=client["index"]: self.run_cmd(f"pactl set-sink-input-volume {idx} {val}%"))
+            slider.show()
+
+            label.show()
+            self.playback_sliders.append((slider, label))
+            y += 40
 
     def show(self):
         self.audio_dropdown.clear()

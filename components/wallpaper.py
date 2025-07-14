@@ -133,14 +133,38 @@ class WallpaperManager:
                 padding: 6px 12px;
                 letter-spacing: 1px;
                 border-radius: 10px;
-                font-size: 16px;
+                font-size: 14px;
             }
             QPushButton:hover {
                 background-color: #edcee3;
             }
         """)
         self.apply_btn.clicked.connect(self.apply_changes)
-        self.apply_btn.setGeometry(250, 570, 200, 150)
+        self.apply_btn.setGeometry(370, 570, 200, 150)
+
+        self.browse_btn = QPushButton("Browse Wallpapers", self.wallpaper_box)
+        self.browse_btn.setFixedSize(200, 50)
+        self.browse_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #e5a7c6;
+                color: white;
+                font-weight: bold;
+                border: none;
+                padding: 6px 12px;
+                letter-spacing: 1px;
+                border-radius: 10px;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: #edcee3;
+            }
+        """)
+        self.browse_btn.clicked.connect(self.open_wallpaper_folder)
+        self.browse_btn.setGeometry(150, 570, 500, 50)
+
+    def open_wallpaper_folder(self):
+        path = os.path.expanduser("~/Elysia/wallpaper")
+        subprocess.Popen(["xdg-open", path])
 
     def show(self):
         self.parent.hide_tiles()

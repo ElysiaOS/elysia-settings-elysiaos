@@ -4,8 +4,33 @@ from PyQt6.QtWidgets import (
     QListWidget, QListWidgetItem, QLineEdit, QInputDialog,
     QMessageBox, QFrame
 )
-from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtCore import QTimer, Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QFont
+
+
+class WifiScanner(QThread):
+    wifi_scanned = pyqtSignal(list, str, bool)  # networks, connected SSID, wifi_enabled
+
+    def run(self):
+        try:
+            wifi_enabled = subprocess.check_output(
+                ['nmcli', 'radio', 'wifi'], encoding='utf-8'
+            ).strip().lower() == 'enabled'
+
+            if not wifi_enabled:
+                self.wifi_scanned.emit([], "None", False)
+                return
+
+            result = subprocess.check_output(
+                ['nmcli', '-t', '-f', 'active,ssid', 'dev', 'wifi'], encoding='utf-8'
+            ).strip().splitlines()
+            connected = next((line.split(":")[1] for line in result if line.startswith("yes:")), "None")
+        except Exception:
+            wifi_enabled = False
+            connected = "Error"
+            result = []
+
+        self.wifi_scanned.emit(result, connected, wifi_enabled)
 
 
 class NetworkManager:
@@ -117,6 +142,9 @@ class NetworkManager:
         self.refresh_timer.timeout.connect(self.refresh_wifi)
         self.refresh_timer.start(5000)
 
+        self.scanner = WifiScanner()
+        self.scanner.wifi_scanned.connect(self.update_wifi_ui)
+
         self.refresh_wifi()
 
     def show(self):
@@ -132,21 +160,13 @@ class NetworkManager:
         self.parent.hide_back_button()
 
     def refresh_wifi(self):
-        try:
-            wifi_enabled = self.is_wifi_enabled()
-            result = subprocess.check_output(
-                ['nmcli', '-t', '-f', 'active,ssid', 'dev', 'wifi'], encoding='utf-8'
-            ).strip().splitlines()
-            connected = next((line.split(":")[1] for line in result if line.startswith("yes:")), "None")
-        except Exception:
-            wifi_enabled = False
-            connected = "Error"
-            result = []
+        if not self.scanner.isRunning():
+            self.scanner.start()
 
+    def update_wifi_ui(self, result, connected, wifi_enabled):
         self.current_label.setText(f"Connected to: {connected}")
         self.wifi_list.clear()
 
-        # Toggle buttons based on Wi-Fi state
         if not wifi_enabled or connected in ["None", "", "Error"]:
             self.disconnect_button.setVisible(False)
             self.enable_button.setVisible(True)
@@ -155,7 +175,7 @@ class NetworkManager:
             self.enable_button.setVisible(False)
 
         if not wifi_enabled:
-            return  # Skip network scan if Wi-Fi is disabled
+            return
 
         saved_ssids = self.get_saved_connections()
 
@@ -285,10 +305,3 @@ class NetworkManager:
         except subprocess.CalledProcessError:
             self.current_label.setText("Failed to enable Wi-Fi.")
         self.refresh_wifi()
-
-    def is_wifi_enabled(self):
-        try:
-            output = subprocess.check_output(['nmcli', 'radio', 'wifi'], encoding='utf-8').strip()
-            return output.lower() == "enabled"
-        except Exception:
-            return False

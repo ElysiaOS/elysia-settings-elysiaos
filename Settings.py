@@ -56,8 +56,8 @@ class AnimatedTile(QPushButton):
         self.glass.lower()
 
         self.label = QLabel(label_text, parent)
-        self.label.setFont(QFont("hoyofont", 14, QFont.Weight.Bold))
-        self.label.setStyleSheet("color: pink; background: transparent;")
+        self.label.setFont(QFont("ElysiaOSNew12", 14, QFont.Weight.Bold))
+        self.label.setStyleSheet("color: #db11fa; background: transparent;")
         self.label.adjustSize()
         self.label.move(*label_pos)
 
@@ -152,7 +152,6 @@ class AnimatedTile(QPushButton):
             return
         self.setStyleSheet(f"border: none; background: transparent; opacity: {self.opacity};")
 
-
 class SettingsWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -160,17 +159,19 @@ class SettingsWindow(QWidget):
         self.setFixedSize(1600, 800)
         self.setMouseTracking(True)
 
+        self.theme_mode = "elysian"
+        self.current_view = None
+        self.destruction_active = False
+        self.tiles = []
+
         self.bg_label = QLabel(self)
         self.bg_label.setPixmap(QPixmap(os.path.join(ASSETS_PATH, "assets/background.png")).scaled(
             self.size(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         self.bg_label.setGeometry(0, 0, self.width(), self.height())
 
-        self.tiles = []
-        self.current_view = None
-        self.destruction_active = False
-
-        self.init_tiles()
         self.init_back_button()
+        self.init_theme_buttons()
+        self.init_tiles()
 
         self.about_manager = AboutManager(self)
         self.display_manager = DisplayManager(self)
@@ -194,36 +195,129 @@ class SettingsWindow(QWidget):
         self.back_btn.clicked.connect(self.handle_back_click)
 
         self.back_label = QLabel("BACK", self)
-        self.back_label.setFont(QFont("hoyofont", 18, QFont.Weight.Bold))
+        self.back_label.setFont(QFont("ElysiaOSNew12", 18, QFont.Weight.Bold))
         self.back_label.setStyleSheet("color: white; background: transparent;")
         self.back_label.adjustSize()
         self.back_label.move(self.back_btn.x() + self.back_btn.width() - 125,
                              self.back_btn.y() + self.back_btn.height() // 2 - self.back_label.height() // 2)
         self.back_label.setVisible(False)
 
+    def init_theme_buttons(self):
+        self.theme_button_amphoreus = QPushButton("Amphoreus mode", self)
+        self.theme_button_amphoreus.setGeometry(self.width() - 250, 20, 200, 40)
+        self.theme_button_amphoreus.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: white;
+                font-weight: bold;
+                border-radius: 10px;
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+        """)
+        self.theme_button_amphoreus.clicked.connect(self.enable_amphoreus_mode)
+
+        self.theme_button_elysian = QPushButton("Elysian Realm mode", self)
+        self.theme_button_elysian.setGeometry(self.width() - 250, 20, 200, 40)
+        self.theme_button_elysian.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: white;
+                font-weight: bold;
+                border-radius: 10px;
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+        """)
+        self.theme_button_elysian.clicked.connect(self.enable_elysian_mode)
+        self.theme_button_elysian.hide()
+
+    def init_tiles(self):
+        def add_tile(theme, img, text, tile_pos, label_pos, handler=None, is_car=False):
+            tile = AnimatedTile(self, os.path.join("assets", img), text, tile_pos, label_pos, click_handler=handler, is_car=is_car)
+            tile.original_image_name = img
+            tile.theme = theme
+            visible = theme == self.theme_mode
+            tile.setVisible(visible)
+            tile.label.setVisible(visible)
+            tile.glass.setVisible(visible)
+            self.tiles.append(tile)
+
+        # Elysian Realm Tiles
+        add_tile("elysian", "about.png", "ABOUT", (750, 240), (764, 210), self.show_about)
+        add_tile("elysian", "display.png", "DISPLAY", (880, 130), (885, 115), self.show_display)
+        add_tile("elysian", "network.png", "NETWORK", (940, 380), (930, 370), self.show_network)
+        add_tile("elysian", "update.png", "UPDATES", (1080, 183), (1075, 180), self.show_update)
+        add_tile("elysian", "snake.png", "STORAGE", (1195, 340), (1200, 330), self.show_storage)
+        add_tile("elysian", "apps.png", "APPS", (1290, 162), (1300, 160), self.show_applications)
+        add_tile("elysian", "support.png", "SUPPORT", (1340, 410), (1330, 405), self.show_support)
+        add_tile("elysian", "bluetooth.png", "BLUETOOTH", (630, 95), (620, 100), self.show_bluetooth)
+        add_tile("elysian", "sound.png", "SOUND", (610, 395), (625, 380), self.show_sound)
+        add_tile("elysian", "power.png", "POWER", (480, 210), (495, 205), self.show_power)
+        add_tile("elysian", "battery.png", "BATTERY", (325, 105), (337, 100), self.show_battery)
+        add_tile("elysian", "wallpaper.png", "APPEARANCE", (366, 355), (349, 340), self.show_wallpaper)
+        add_tile("elysian", "car.png", "CAR", (190, 290), (225, 290), self.trigger_destruction, is_car=True)
+
+        # Amphoreus Tiles
+        add_tile("amphoreus", "about2.png", "ABOUT", (852, 240), (852, 355), self.show_about)
+        add_tile("amphoreus", "display2.png", "DISPLAY", (320, 595), (320, 715), self.show_display)
+        add_tile("amphoreus", "network2.png", "NETWORK", (320, 395), (320, 510), self.show_network)
+        add_tile("amphoreus", "update2.png", "UPDATES", (495, 595), (495, 715), self.show_update)
+        add_tile("amphoreus", "snake2.png", "STORAGE", (500, 395), (500, 510), self.show_storage)
+        add_tile("amphoreus", "apps2.png", "APPS", (850, 395), (850, 510), self.show_applications)
+        add_tile("amphoreus", "support2.png", "SUPPORT", (1030, 595), (1030, 715), self.show_support)
+        add_tile("amphoreus", "bluetooth2.png", "BLUETOOTH", (675, 595), (675, 715), self.show_bluetooth)
+        add_tile("amphoreus", "sound2.png", "SOUND", (1030, 395), (1030, 510), self.show_sound)
+        add_tile("amphoreus", "power2.png", "POWER", (850, 595), (850, 715), self.show_power)
+        add_tile("amphoreus", "battery2.png", "BATTERY", (675, 395), (675, 510), self.show_battery)
+        add_tile("amphoreus", "wallpaper2.png", "APPEARANCE", (1210, 395), (1210, 510), self.show_wallpaper)
+        add_tile("amphoreus", "car2.png", "CAR", (1210, 595), (1210, 715), self.trigger_destruction, is_car=True)
+
+    def update_tile_visibility(self):
+        for tile in self.tiles:
+            visible = tile.theme == self.theme_mode
+            tile.setVisible(visible)
+            tile.glass.setVisible(visible)
+            tile.label.setVisible(visible)
+
+    def enable_amphoreus_mode(self):
+        self.theme_mode = "amphoreus"
+        self.theme_button_amphoreus.hide()
+        self.theme_button_elysian.show()
+        self.bg_label.setPixmap(QPixmap(os.path.join(ASSETS_PATH, "assets/background2.png")).scaled(
+            self.size(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
+        self.update_tile_visibility()
+
+    def enable_elysian_mode(self):
+        self.theme_mode = "elysian"
+        self.theme_button_elysian.hide()
+        self.theme_button_amphoreus.show()
+        self.bg_label.setPixmap(QPixmap(os.path.join(ASSETS_PATH, "assets/background.png")).scaled(
+            self.size(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
+        self.update_tile_visibility()
+
     def handle_back_click(self):
         if self.current_view:
             getattr(self, f"{self.current_view}_manager").hide()
             self.current_view = None
 
-    def init_tiles(self):
-        def add_tile(img, text, tile_pos, label_pos, handler=None, is_car=False):
-            tile = AnimatedTile(self, os.path.join("assets", img), text, tile_pos, label_pos, click_handler=handler, is_car=is_car)
-            self.tiles.append(tile)
+        self.update_tile_visibility()
+        self.show_tiles()
+        self.hide_back_button()
 
-        add_tile("about.png", "ABOUT", (750, 240), (764, 210), self.show_about)
-        add_tile("display.png", "DISPLAY", (880, 130), (885, 115), self.show_display)
-        add_tile("network.png", "NETWORK", (940, 380), (930, 370), self.show_network)
-        add_tile("update.png", "UPDATES", (1080, 183), (1075, 180), self.show_update)
-        add_tile("snake.png", "STORAGE", (1195, 340), (1200, 330), self.show_storage)
-        add_tile("apps.png", "APPS", (1290, 162), (1300, 160), self.show_applications)
-        add_tile("support.png", "SUPPORT", (1340, 410), (1330, 405), self.show_support)
-        add_tile("bluetooth.png", "BLUETOOTH", (630, 95), (620, 100), self.show_bluetooth)
-        add_tile("sound.png", "SOUND", (610, 395), (625, 380), self.show_sound)
-        add_tile("power.png", "POWER", (480, 210), (495, 205), self.show_power)
-        add_tile("battery.png", "BATTERY", (325, 105), (337, 100), self.show_battery)
-        add_tile("wallpaper.png", "APPEARANCE", (366, 355), (349, 340), self.show_wallpaper)
-        add_tile("car.png", "CAR", (190, 290), (225, 290), self.trigger_destruction, is_car=True)
+        if self.theme_mode == "elysian":
+            self.bg_label.setPixmap(QPixmap(os.path.join(ASSETS_PATH, "assets/background.png")).scaled(
+                self.size(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
+            self.theme_button_amphoreus.show()
+            self.theme_button_elysian.hide()
+        else:
+            self.bg_label.setPixmap(QPixmap(os.path.join(ASSETS_PATH, "assets/background2.png")).scaled(
+                self.size(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
+            self.theme_button_elysian.show()
+            self.theme_button_amphoreus.hide()
+
 
     def show_about(self): self._show_section("about")
     def show_display(self): self._show_section("display")
@@ -240,6 +334,16 @@ class SettingsWindow(QWidget):
         if not self.destruction_active:
             self.current_view = name
             getattr(self, f"{name}_manager").show()
+            self.theme_button_amphoreus.hide()
+            self.theme_button_elysian.hide()
+
+        if self.theme_mode == "amphoreus":
+            self.bg_label.setPixmap(QPixmap(os.path.join(ASSETS_PATH, "assets/background3.png")).scaled(
+                self.size(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
+        elif self.theme_mode == "elysian":
+            self.bg_label.setPixmap(QPixmap(os.path.join(ASSETS_PATH, "assets/background4.png")).scaled(
+                self.size(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
+
 
     def show_support(self):
         if not self.destruction_active:
@@ -248,7 +352,7 @@ class SettingsWindow(QWidget):
     def show_update(self):
         if not self.destruction_active:
             try:
-                subprocess.Popen([os.path.expanduser("elysia-updater.sh")])
+                subprocess.Popen([os.path.expanduser("~/bin/elysia-updater.sh")])
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed to run update script:\n{e}")
 
@@ -268,7 +372,7 @@ class SettingsWindow(QWidget):
 
     def show_tiles(self):
         for tile in self.tiles:
-            if not tile.is_destroyed:
+            if not tile.is_destroyed and tile.theme == self.theme_mode:
                 tile.show(); tile.glass.show(); tile.label.show()
 
     def show_back_button(self): self.back_btn.setVisible(True); self.back_label.setVisible(True)

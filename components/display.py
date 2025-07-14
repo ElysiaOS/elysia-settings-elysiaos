@@ -10,7 +10,7 @@ class DisplayManager:
     def __init__(self, parent):
         self.parent = parent
         self.refresh_timer = QTimer()
-        self.refresh_timer.setInterval(1000)
+        self.refresh_timer.setInterval(5000)
         self.refresh_timer.timeout.connect(self.auto_refresh)
         self.init_display()
 
@@ -170,8 +170,9 @@ class DisplayManager:
             self.display_dropdown.addItems(modes)
 
         current_mode = None
+        config_path = os.path.expanduser("~/.config/hypr/hyprland.conf")
         try:
-            with open("/home/matsuko/.config/hypr/hyprland.conf", "r") as f:
+            with open(config_path, "r") as f:
                 for line in f:
                     if line.startswith("monitor") and "@" in line:
                         match = re.search(r"\d{3,4}x\d{3,4}@\d{2,3}", line)
@@ -214,7 +215,7 @@ class DisplayManager:
             self.brightness_slider.setValue(50)
 
     def get_current_monitor_line(self):
-        path = "/home/matsuko/.config/hypr/hyprland.conf"
+        path = os.path.expanduser("~/.config/hypr/hyprland.conf")
         try:
             with open(path, "r") as f:
                 lines = f.readlines()
@@ -234,8 +235,9 @@ class DisplayManager:
             return
 
         lines[index] = re.sub(r"\d{3,4}x\d{3,4}@\d{2,3}", new_mode, lines[index])
+        config_path = os.path.expanduser("~/.config/hypr/hyprland.conf")
         try:
-            with open("/home/matsuko/.config/hypr/hyprland.conf", "w") as f:
+            with open(config_path, "w") as f:
                 f.writelines(lines)
         except Exception as e:
             QMessageBox.warning(self.parent, "Error", f"Failed to write file:\n{e}")
