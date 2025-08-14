@@ -25,6 +25,9 @@ class MainWindow : public QWidget {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    
+    // Public method to launch specific sections from command line
+    void launchSection(const QString &sectionName);
 
 private slots:
     void handleBackClick();
@@ -84,4 +87,4 @@ private:
     std::unique_ptr<Sound> soundManager;
     std::unique_ptr<Storage> storageManager;
     std::unique_ptr<Wallpaper> wallpaperManager;
-}; 
+};

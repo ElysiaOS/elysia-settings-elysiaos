@@ -281,7 +281,7 @@ void MainWindow::showSupport() {
 void MainWindow::showUpdate() {
     if (!destructionActive) {
         try {
-            QProcess::startDetached(QDir::homePath() + "/bin/elysia-updater.sh");
+            QProcess::startDetached("/usr/bin/elysia-updater.sh");
         } catch (...) {
             QMessageBox::critical(this, "Error", "Failed to run update script");
         }
@@ -334,3 +334,35 @@ void MainWindow::hideBackButton() {
     backBtn->setVisible(false);
     backLabel->setVisible(false);
 } 
+
+void MainWindow::launchSection(const QString &sectionName) {
+    // Map of valid section names to their corresponding show methods
+    QMap<QString, std::function<void()>> sectionMap = {
+        {"about", [this]() { showAbout(); }},
+        {"display", [this]() { showDisplay(); }},
+        {"network", [this]() { showNetwork(); }},
+        {"sound", [this]() { showSound(); }},
+        {"applications", [this]() { showApplications(); }},
+        {"apps", [this]() { showApplications(); }},  // Alias
+        {"hyprland", [this]() { showApplications(); }},  // Alias
+        {"wallpaper", [this]() { showWallpaper(); }},
+        {"appearance", [this]() { showWallpaper(); }},  // Alias
+        {"bluetooth", [this]() { showBluetooth(); }},
+        {"battery", [this]() { showBattery(); }},
+        {"power", [this]() { showPower(); }},
+        {"storage", [this]() { showStorage(); }},
+        {"support", [this]() { showSupport(); }},
+        {"update", [this]() { showUpdate(); }},
+        {"updates", [this]() { showUpdate(); }}  // Alias
+    };
+    
+    // Check if the section exists and launch it
+    if (sectionMap.contains(sectionName)) {
+        // Use QTimer::singleShot to ensure the window is fully initialized first
+        QTimer::singleShot(100, this, sectionMap[sectionName]);
+    } else {
+        // Invalid section name - just show the main interface
+        qWarning() << "Unknown section:" << sectionName;
+        qWarning() << "Valid sections: about, display, network, sound, applications, wallpaper, bluetooth, battery, power, storage, support, update";
+    }
+}
