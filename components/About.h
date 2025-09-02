@@ -4,6 +4,7 @@
 #include <QLabel>
 #include <QVector>
 #include <QString>
+#include "../translations.h"
 
 class About : public QObject {
     Q_OBJECT

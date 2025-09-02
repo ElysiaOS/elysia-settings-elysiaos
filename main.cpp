@@ -3,24 +3,28 @@
 #include <QCommandLineOption>
 #include <QStringList>
 #include "MainWindow.h"
+#include "translations.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     
+    // Initialize translations
+    ensureTranslationsInitialized();
+    
     // Set application metadata for command line parser
-    app.setApplicationName("Elysia Settings");
+    app.setApplicationName(Translations::tr("WINDOW_TITLE"));
     app.setApplicationVersion("1.6");
-    app.setApplicationDisplayName("Elysia Settings");
+    app.setApplicationDisplayName(Translations::tr("WINDOW_TITLE"));
     
     // Create command line parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Elysia OS Settings Application");
+    parser.setApplicationDescription(Translations::tr("WINDOW_TITLE"));
     parser.addHelpOption();
     parser.addVersionOption();
     
     // Add positional argument for section
-    parser.addPositionalArgument("section", "Settings section to open directly (optional)", "[section]");
+    parser.addPositionalArgument("section", Translations::tr("WINDOW_TITLE"), "[section]");
     
     // Parse command line arguments
     parser.process(app);

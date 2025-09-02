@@ -1,5 +1,6 @@
 #pragma once
 #include <QObject>
+#include "../translations.h"
 #include <QWidget>
 #include <QLabel>
 #include <QComboBox>

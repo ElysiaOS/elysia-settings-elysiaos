@@ -1,4 +1,5 @@
 #include "Wallpaper.h"
+#include "../translations.h"
 #include <QDir>
 #include <QFont>
 #include <QPixmap>
@@ -49,7 +50,7 @@ void Wallpaper::initWallpaperUI() {
     themeFrameLayout->setContentsMargins(0, 0, 0, 0);
     themeFrameLayout->setSpacing(10);
 
-    QLabel *themeLabel = new QLabel("Theme", themeFrame);
+    QLabel *themeLabel = new QLabel(Translations::tr("WALLPAPER_TITLE"), themeFrame);
     themeLabel->setFont(QFont("ElysiaOSNew", 22, QFont::Bold));
     themeLabel->setStyleSheet("color: #fff; background: transparent; border: none; letter-spacing: 2px;");
     themeLabel->setAlignment(Qt::AlignCenter);
@@ -67,7 +68,7 @@ void Wallpaper::initWallpaperUI() {
             "background: transparent; border: none; border-radius: 18px;"
         );
         frame->setCursor(Qt::PointingHandCursor);
-        frame->setToolTip("Switch to " + theme + " theme");
+        frame->setToolTip(Translations::tr("WALLPAPER"));
         QVBoxLayout *frameLayout = new QVBoxLayout(frame);
         frameLayout->setContentsMargins(0, 0, 0, 0);
         frameLayout->setSpacing(0);
@@ -79,7 +80,7 @@ void Wallpaper::initWallpaperUI() {
             QPixmap pixmap(imagePath);
             imageLabel->setPixmap(pixmap.scaled(90, 90, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         } else {
-            imageLabel->setText("Missing");
+            imageLabel->setText(Translations::tr("MISSING"));
         }
         imageLabel->setStyleSheet("background: transparent; border: none; margin: 0; padding: 0;");
         QLabel *tick = new QLabel("✔");
@@ -100,7 +101,7 @@ void Wallpaper::initWallpaperUI() {
     mainLayout->addSpacing(24);
 
     // WALLPAPER PREVIEW AREA
-    QLabel *wallpaperLabel = new QLabel("Wallpaper", wallpaperBox);
+    QLabel *wallpaperLabel = new QLabel(Translations::tr("WALLPAPER"), wallpaperBox);
     wallpaperLabel->setFont(QFont("ElysiaOSNew", 20, QFont::Bold));
     wallpaperLabel->setStyleSheet("color: #fff; background: transparent; border: none; letter-spacing: 2px;");
     wallpaperLabel->setAlignment(Qt::AlignCenter);
@@ -144,7 +145,7 @@ void Wallpaper::initWallpaperUI() {
     mainLayout->addSpacing(32);
 
     // BUTTONS AREA
-    browseBtn = new QPushButton("Browse", wallpaperBox);
+    browseBtn = new QPushButton(Translations::tr("SELECT_IMAGE"), wallpaperBox);
     browseBtn->setFixedSize(140, 40);
     browseBtn->setStyleSheet(
         "QPushButton {"
@@ -166,7 +167,7 @@ void Wallpaper::initWallpaperUI() {
     // Place directly under the preview, left side
     browseBtn->move(280, 550);
 
-    applyBtn = new QPushButton("Apply", wallpaperBox);
+    applyBtn = new QPushButton(Translations::tr("APPLY_WALLPAPER"), wallpaperBox);
     applyBtn->setFixedSize(140, 40);
     applyBtn->setStyleSheet(
         "QPushButton {"

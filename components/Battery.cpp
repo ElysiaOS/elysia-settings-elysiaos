@@ -1,4 +1,5 @@
 #include "Battery.h"
+#include "../translations.h"
 #include <QDir>
 #include <QFont>
 #include <QProcess>
@@ -60,13 +61,13 @@ void Battery::initBatteryUI() {
     QVBoxLayout *layout = new QVBoxLayout(batteryBox);
     layout->setContentsMargins(40, 40, 40, 40);
     layout->setSpacing(18);
-    QLabel *title = new QLabel("BATTERY", batteryBox);
+    QLabel *title = new QLabel(Translations::tr("BATTERY_TITLE"), batteryBox);
     title->setFont(QFont("ElysiaOSNew", 17, QFont::Bold));
     title->setStyleSheet("color: white; background: transparent; border: none; margin: 0px; padding: 0px");
     title->setAlignment(Qt::AlignCenter);
     layout->addWidget(title);
     if (batteryDevice.isEmpty()) {
-        QLabel *label = new QLabel("No battery device found.", batteryBox);
+        QLabel *label = new QLabel(Translations::tr("BATTERY_TITLE"), batteryBox);
         label->setFont(QFont("ElysiaOSNew", 12));
         label->setStyleSheet("color: white; background: transparent; border: none; margin: 0px; padding: 0px");
         label->setWordWrap(true);

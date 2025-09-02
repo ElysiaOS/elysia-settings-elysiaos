@@ -1,4 +1,5 @@
 #include "Display.h"
+#include "../translations.h"
 #include <QDir>
 #include <QFont>
 #include <QPixmap>
@@ -42,7 +43,7 @@ DisplayManager::DisplayManager(QObject *parent) : QObject(parent) {
     displayBox->setVisible(false);
     
     // Resolution label
-    resolutionLabel = new QLabel("Resolution", displayBox);
+    resolutionLabel = new QLabel(Translations::tr("RESOLUTION"), displayBox);
     QFont resFont("ElysiaOSNew", 14);
     resolutionLabel->setFont(resFont);
     resolutionLabel->setStyleSheet("color: white; background: transparent; border: none; margin: 0px; padding: 0px");
@@ -74,7 +75,7 @@ DisplayManager::DisplayManager(QObject *parent) : QObject(parent) {
     );
     
     // Brightness label
-    brightnessLabel = new QLabel("Brightness", displayBox);
+    brightnessLabel = new QLabel(Translations::tr("BRIGHTNESS"), displayBox);
     QFont brightFont("ElysiaOSNew", 14);
     brightnessLabel->setFont(brightFont);
     brightnessLabel->setStyleSheet("color: white; background: transparent; border: none; margin: 0px; padding: 0px");
@@ -118,7 +119,7 @@ DisplayManager::DisplayManager(QObject *parent) : QObject(parent) {
     connect(brightnessSlider, &QSlider::valueChanged, this, &DisplayManager::setBrightness);
     
     // Apply button
-    applyBtn = new QPushButton("Apply Changes", displayBox);
+    applyBtn = new QPushButton(Translations::tr("APPLY_CHANGES"), displayBox);
     applyBtn->setGeometry(200, 400, 200, 50);
     applyBtn->setStyleSheet(
         "QPushButton {"
@@ -230,7 +231,7 @@ void DisplayManager::setBrightness(int value) {
     try {
         QProcess::startDetached("brightnessctl", QStringList() << "set" << QString::number(value) + "%");
     } catch (...) {
-        QMessageBox::warning(qobject_cast<QWidget*>(parent()), "Error", "Failed to set brightness");
+        QMessageBox::warning(qobject_cast<QWidget*>(parent()), Translations::tr("ERROR_FASTFETCH"), "Failed to set brightness");
     }
 }
 
@@ -292,7 +293,7 @@ void DisplayManager::applyDisplayChange() {
     QStringList lines = result.second;
     
     if (index == -1) {
-        QMessageBox::warning(qobject_cast<QWidget*>(parent()), "Error", "Could not find monitor config line.");
+        QMessageBox::warning(qobject_cast<QWidget*>(parent()), Translations::tr("ERROR_FASTFETCH"), "Could not find monitor config line.");
         return;
     }
     
@@ -308,11 +309,11 @@ void DisplayManager::applyDisplayChange() {
         }
         file.close();
     } else {
-        QMessageBox::warning(qobject_cast<QWidget*>(parent()), "Error", "Failed to write file");
+        QMessageBox::warning(qobject_cast<QWidget*>(parent()), Translations::tr("ERROR_FASTFETCH"), "Failed to write file");
         return;
     }
     
-    QMessageBox::information(qobject_cast<QWidget*>(parent()), "Success", 
+            QMessageBox::information(qobject_cast<QWidget*>(parent()), Translations::tr("SUCCESS"), 
                            QString("Display mode changed to %1.\nRestart Hyprland for changes to apply.").arg(newMode));
 }
 

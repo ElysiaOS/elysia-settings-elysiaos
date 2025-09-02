@@ -14,6 +14,7 @@ set(SOURCES
     main.cpp
     MainWindow.cpp
     AnimatedTile.cpp
+    translations.cpp
     components/About.cpp
     components/Applications.cpp
     components/Battery.cpp
@@ -29,6 +30,7 @@ set(SOURCES
 set(HEADERS
     MainWindow.h
     AnimatedTile.h
+    translations.h
     components/About.h
     components/Applications.h
     components/Battery.h

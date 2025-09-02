@@ -1,4 +1,5 @@
 #include "Network.h"
+#include "../translations.h"
 #include <QDir>
 #include <QFont>
 #include <QProcess>
@@ -81,7 +82,7 @@ void Network::initNetworkUI() {
     layout->setContentsMargins(30, 30, 30, 30);
     layout->setSpacing(15);
     
-    currentLabel = new QLabel("Connected to: Loading...", networkBox);
+    currentLabel = new QLabel(QString(Translations::tr("CONNECTED_TO")).arg(Translations::tr("CONNECTING")), networkBox);
     QFont currentFont("ElysiaOSNew", 16, QFont::Bold);
     currentLabel->setFont(currentFont);
     currentLabel->setStyleSheet(
@@ -94,7 +95,7 @@ void Network::initNetworkUI() {
     currentLabel->setAlignment(Qt::AlignCenter);
     layout->addWidget(currentLabel);
     
-    disconnectButton = new QPushButton("Disconnect", networkBox);
+    disconnectButton = new QPushButton(Translations::tr("DISCONNECT"), networkBox);
     disconnectButton->setFixedHeight(40);
     disconnectButton->setStyleSheet(
         "QPushButton {"
@@ -112,7 +113,7 @@ void Network::initNetworkUI() {
     connect(disconnectButton, &QPushButton::clicked, this, &Network::disconnectWifi);
     layout->addWidget(disconnectButton, 0, Qt::AlignCenter);
     
-    enableButton = new QPushButton("Enable Wi-Fi", networkBox);
+    enableButton = new QPushButton(Translations::tr("WIFI"), networkBox);
     enableButton->setFixedHeight(40);
     enableButton->setStyleSheet(
         "QPushButton {"
@@ -131,7 +132,7 @@ void Network::initNetworkUI() {
     layout->addWidget(enableButton, 0, Qt::AlignCenter);
     enableButton->setVisible(false);
     
-    listLabel = new QLabel("Available Wi-Fi Networks:", networkBox);
+    listLabel = new QLabel(Translations::tr("NETWORK_TITLE"), networkBox);
     QFont listFont("ElysiaOSNew", 14);
     listLabel->setFont(listFont);
     listLabel->setStyleSheet(
@@ -186,7 +187,7 @@ void Network::refreshWifi() {
 }
 
 void Network::updateWifiUI(QStringList result, QString connected, bool wifiEnabled) {
-    currentLabel->setText(QString("Connected to: %1").arg(connected));
+    currentLabel->setText(QString(Translations::tr("CONNECTED_TO")).arg(connected));
     wifiList->clear();
     
     if (!wifiEnabled || connected == "None" || connected.isEmpty() || connected == "Error") {
@@ -227,7 +228,7 @@ void Network::updateWifiUI(QStringList result, QString connected, bool wifiEnabl
             "padding: 0px;"
         );
         
-        QPushButton *connectBtn = new QPushButton("Connect");
+                    QPushButton *connectBtn = new QPushButton(Translations::tr("CONNECT"));
         connectBtn->setFixedWidth(100);
         connectBtn->setStyleSheet(
             "QPushButton {"
@@ -252,7 +253,7 @@ void Network::updateWifiUI(QStringList result, QString connected, bool wifiEnabl
         itemLayout->addWidget(connectBtn);
         
         if (savedSSIDs.contains(ssid)) {
-            QPushButton *forgetBtn = new QPushButton("Forget");
+            QPushButton *forgetBtn = new QPushButton(Translations::tr("FORGET"));
             forgetBtn->setFixedWidth(100);
             forgetBtn->setStyleSheet(
                 "QPushButton {"
@@ -287,12 +288,12 @@ void Network::connectToWifi(const QString &ssid) {
             QProcess::startDetached("nmcli", QStringList() << "connection" << "up" << ssid);
             currentLabel->setText(QString("Connected to: %1").arg(ssid));
         } catch (...) {
-            QMessageBox::warning(qobject_cast<QWidget*>(parent()), "Error", 
+            QMessageBox::warning(qobject_cast<QWidget*>(parent()), Translations::tr("ERROR_FASTFETCH"), 
                                QString("Failed to connect to saved network %1.").arg(ssid));
         }
     } else {
         bool ok;
-        QString password = QInputDialog::getText(networkBox, "Wi-Fi Password",
+        QString password = QInputDialog::getText(networkBox, Translations::tr("PASSWORD"),
                                                QString("Enter password for %1:").arg(ssid),
                                                QLineEdit::Password, "", &ok);
         if (ok && !password.isEmpty()) {
@@ -300,7 +301,7 @@ void Network::connectToWifi(const QString &ssid) {
                 QProcess::startDetached("nmcli", QStringList() << "device" << "wifi" << "connect" << ssid << "password" << password);
                 currentLabel->setText(QString("Connected to: %1").arg(ssid));
             } catch (...) {
-                QMessageBox::warning(qobject_cast<QWidget*>(parent()), "Error", 
+                QMessageBox::warning(qobject_cast<QWidget*>(parent()), Translations::tr("ERROR_FASTFETCH"), 
                                    QString("Failed to connect to %1.").arg(ssid));
             }
         }
@@ -313,14 +314,14 @@ void Network::forgetWifi(const QString &ssid) {
     if (isSavedConnection(ssid)) {
         try {
             QProcess::startDetached("nmcli", QStringList() << "connection" << "delete" << ssid);
-            QMessageBox::information(qobject_cast<QWidget*>(parent()), "Success", 
+            QMessageBox::information(qobject_cast<QWidget*>(parent()), Translations::tr("SUCCESS"), 
                                    QString("Forgot network %1.").arg(ssid));
         } catch (...) {
-            QMessageBox::warning(qobject_cast<QWidget*>(parent()), "Error", 
+            QMessageBox::warning(qobject_cast<QWidget*>(parent()), Translations::tr("ERROR_FASTFETCH"), 
                                QString("Failed to forget network %1.").arg(ssid));
         }
     } else {
-        QMessageBox::information(qobject_cast<QWidget*>(parent()), "Info", 
+        QMessageBox::information(qobject_cast<QWidget*>(parent()), Translations::tr("NETWORK_TITLE"), 
                                QString("No saved connection for %1.").arg(ssid));
     }
     refreshWifi();
@@ -349,9 +350,9 @@ void Network::disconnectWifi() {
     try {
         QProcess::startDetached("nmcli", QStringList() << "networking" << "off");
         QProcess::startDetached("nmcli", QStringList() << "networking" << "on");
-        currentLabel->setText("Disconnected.");
+        currentLabel->setText(Translations::tr("DISCONNECTED"));
     } catch (...) {
-        currentLabel->setText("Failed to disconnect.");
+        currentLabel->setText(Translations::tr("ERROR_FASTFETCH"));
     }
     refreshWifi();
 }
@@ -359,9 +360,9 @@ void Network::disconnectWifi() {
 void Network::enableWifi() {
     try {
         QProcess::startDetached("nmcli", QStringList() << "radio" << "wifi" << "on");
-        currentLabel->setText("Wi-Fi Enabled.");
+        currentLabel->setText(Translations::tr("WIFI"));
     } catch (...) {
-        currentLabel->setText("Failed to enable Wi-Fi.");
+        currentLabel->setText(Translations::tr("ERROR_FASTFETCH"));
     }
     refreshWifi();
 } 

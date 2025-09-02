@@ -6,6 +6,7 @@
 #include <QVector>
 #include <memory>
 #include <functional>
+#include "translations.h"
 
 // Include all component headers
 #include "components/About.h"

@@ -9,6 +9,7 @@
 #include <QFrame>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include "../translations.h"
 
 class Bluetooth : public QObject {
     Q_OBJECT

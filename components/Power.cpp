@@ -1,4 +1,5 @@
 #include "Power.h"
+#include "../translations.h"
 #include <QDir>
 #include <QFont>
 #include <QProcess>
@@ -36,7 +37,7 @@ void Power::initUI() {
     QVBoxLayout *layout = new QVBoxLayout(powerBox);
     layout->setContentsMargins(150, 100, 150, 200); // match Python
     layout->setSpacing(25);
-    QLabel *powerLabel = new QLabel("POWER options", powerBox);
+    QLabel *powerLabel = new QLabel(Translations::tr("POWER_OPTIONS"), powerBox);
     powerLabel->setFont(QFont("ElysiaOSNew", 16));
     powerLabel->setStyleSheet("color: white; background: transparent; border: none; margin: 0px; padding: 0px");
     powerLabel->setAlignment(Qt::AlignCenter);
@@ -46,9 +47,9 @@ void Power::initUI() {
     modeContainer->setSpacing(30);
     modeContainer->setAlignment(Qt::AlignCenter);
     QMap<QString, QPair<QString, QString>> modes = {
-        {"performance", {"Performance", "performance.png"}},
-        {"balanced", {"Balanced", "balanced.png"}},
-        {"default", {"Default", "default.png"}}
+        {"performance", {Translations::tr("PERFORMANCE"), "performance.png"}},
+        {"balanced", {Translations::tr("BALANCED"), "balanced.png"}},
+        {"default", {Translations::tr("DEFAULT"), "default.png"}}
     };
     for (auto it = modes.begin(); it != modes.end(); ++it) {
         QString modeKey = it.key();
@@ -75,7 +76,7 @@ void Power::initUI() {
             QPixmap pixmap(iconPath);
             imageLabel->setPixmap(pixmap.scaled(130, 130, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         } else {
-            imageLabel->setText("Missing");
+            imageLabel->setText(Translations::tr("MISSING"));
         }
         QLabel *tick = new QLabel(QString::fromUtf8("\u2714"));
         tick->setStyleSheet("color: #e5a7c6; font-size: 24px; background: transparent; border: none;");
@@ -91,7 +92,7 @@ void Power::initUI() {
     }
     layout->addLayout(modeContainer);
     // Apply button
-    applyBtn = new QPushButton("Apply Changes", powerBox);
+    applyBtn = new QPushButton(Translations::tr("APPLY_CHANGES"), powerBox);
     applyBtn->setFixedSize(170, 40);
     applyBtn->setStyleSheet(
         "QPushButton {"
@@ -108,7 +109,7 @@ void Power::initUI() {
         "    background: #edcee3; color: #a87c4f;"
         "}"
     );
-    applyBtn->setToolTip("Apply selected power mode");
+    applyBtn->setToolTip(Translations::tr("APPLY_TOOLTIP"));
     connect(applyBtn, &QPushButton::clicked, this, &Power::applyChanges);
     // Place button near the bottom center of the box
     applyBtn->move((680-140)/2, 400);
@@ -186,12 +187,12 @@ void Power::applyChanges() {
         process.setProcessEnvironment(env);
         process.start("pkexec", args);
         if (!process.waitForStarted(5000)) {
-            QMessageBox::warning(powerBox, "Error", "Failed to start pkexec.\nCheck your polkit setup and environment.");
+            QMessageBox::warning(powerBox, Translations::tr("ERROR_FASTFETCH"), "Failed to start pkexec.\nCheck your polkit setup and environment.");
             return;
         }
         process.waitForFinished(-1); // Wait for user to complete polkit prompt
         if (process.exitStatus() != QProcess::NormalExit || process.exitCode() != 0) {
-            QMessageBox::warning(powerBox, "Error", "Failed to apply CPU profile.\n\nOutput:\n" + process.readAllStandardError());
+            QMessageBox::warning(powerBox, Translations::tr("ERROR_FASTFETCH"), "Failed to apply CPU profile.\n\nOutput:\n" + process.readAllStandardError());
         }
     }
 }

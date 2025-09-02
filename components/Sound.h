@@ -10,6 +10,7 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QMap>
+#include "../translations.h"
 
 class Sound : public QObject {
     Q_OBJECT

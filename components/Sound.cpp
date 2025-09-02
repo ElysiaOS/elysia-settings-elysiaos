@@ -1,4 +1,5 @@
 #include "Sound.h"
+#include "../translations.h"
 #include <QDir>
 #include <QFont>
 #include <QProcess>
@@ -37,7 +38,7 @@ void Sound::initUI() {
     soundBox->setVisible(false);
     QFont font("ElysiaOSNew", 14);
     // Audio Output
-    audioLabel = new QLabel("Audio Output", soundBox);
+    audioLabel = new QLabel(Translations::tr("OUTPUT_DEVICES"), soundBox);
     audioLabel->setFont(font);
     audioLabel->setStyleSheet("color: white; background: transparent; border: none; margin: 0px; padding: 0px");
     audioLabel->move(220, 30);
@@ -74,7 +75,7 @@ void Sound::initUI() {
     );
     connect(audioSlider, &QSlider::valueChanged, this, &Sound::debounceAudio);
     // Microphone Input
-    micLabel = new QLabel("Microphone Input", soundBox);
+    micLabel = new QLabel(Translations::tr("INPUT_DEVICES"), soundBox);
     micLabel->setFont(font);
     micLabel->setStyleSheet("color: white; background: transparent; border: none; margin: 0px; padding: 0px");
     micLabel->move(220, 170);
@@ -89,7 +90,7 @@ void Sound::initUI() {
     micSlider->setStyleSheet(audioSlider->styleSheet());
     connect(micSlider, &QSlider::valueChanged, this, &Sound::debounceMic);
     // Playback Clients
-    clientsLabel = new QLabel("Apps Using Audio", soundBox);
+    clientsLabel = new QLabel(Translations::tr("SOUND_TITLE"), soundBox);
     clientsLabel->setFont(font);
     clientsLabel->setStyleSheet("color: white; background: transparent; border: none; margin: 0px; padding: 0px");
     clientsLabel->move(220, 320);
@@ -115,7 +116,7 @@ void Sound::initUI() {
     );
     clientsWidget->setStyleSheet("color: white; background: transparent; border: none; margin: 0px; padding: 0px;");
     // Apply button
-    applyBtn = new QPushButton("Apply Changes", soundBox);
+    applyBtn = new QPushButton(Translations::tr("APPLY_CHANGES"), soundBox);
     applyBtn->setGeometry(200, 570, 200, 50);
     applyBtn->setStyleSheet(
         "QPushButton {"
@@ -320,7 +321,7 @@ void Sound::applyChanges() {
     setMicInput();
     setAudioVolume(audioSlider->value());
     setMicVolume(micSlider->value());
-    QMessageBox::information(soundBox, "Audio", "Settings applied.");
+            QMessageBox::information(soundBox, Translations::tr("SOUND_TITLE"), "Settings applied.");
 }
 
 void Sound::refreshState() {
@@ -419,7 +420,7 @@ void Sound::updatePlaybackClients() {
     appSliders.clear();
 
     if (clients.isEmpty()) {
-        QLabel *noAppsLabel = new QLabel("No applications are currently using audio.", clientsWidget);
+        QLabel *noAppsLabel = new QLabel(Translations::tr("SOUND_TITLE"), clientsWidget);
         noAppsLabel->setAlignment(Qt::AlignCenter);
         noAppsLabel->setStyleSheet("color: white; background: transparent; border: none; margin: 0px; padding: 0px");
         clientsLayout->addWidget(noAppsLabel);

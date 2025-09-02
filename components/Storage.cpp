@@ -1,4 +1,5 @@
 #include "Storage.h"
+#include "../translations.h"
 #include <QDir>
 #include <QFont>
 #include <QProcess>
@@ -35,7 +36,7 @@ void Storage::initUI() {
     QVBoxLayout *mainLayout = new QVBoxLayout(storageBox);
     mainLayout->setContentsMargins(60, 60, 60, 60);
     mainLayout->setSpacing(20);
-    QLabel *storageLabel = new QLabel("STORAGE", storageBox);
+    QLabel *storageLabel = new QLabel(Translations::tr("STORAGE_TITLE"), storageBox);
     storageLabel->setFont(QFont("ElysiaOSNew", 16));
     storageLabel->setStyleSheet("color: white; background: transparent; border: none;");
     storageLabel->setAlignment(Qt::AlignCenter);

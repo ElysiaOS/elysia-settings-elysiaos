@@ -1,6 +1,7 @@
 #pragma once
 #include <QObject>
 #include <QWidget>
+#include "../translations.h"
 #include <QLabel>
 #include <QTimer>
 #include <QString>

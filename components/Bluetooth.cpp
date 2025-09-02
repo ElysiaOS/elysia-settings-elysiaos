@@ -1,4 +1,5 @@
 #include "Bluetooth.h"
+#include "../translations.h"
 #include <QDir>
 #include <QFont>
 #include <QProcess>
@@ -32,14 +33,14 @@ void Bluetooth::initBluetoothUI() {
     mainLayout = new QVBoxLayout(bluetoothBox);
     mainLayout->setContentsMargins(30, 30, 30, 30);
     mainLayout->setSpacing(15);
-    statusLabel = new QLabel("Bluetooth: Loading...", bluetoothBox);
+    statusLabel = new QLabel(QString(Translations::tr("BLUETOOTH_STATUS")).arg(Translations::tr("BLUETOOTH_OFF")), bluetoothBox);
     statusLabel->setFont(QFont("ElysiaOSNew", 16, QFont::Bold));
     statusLabel->setStyleSheet("color: white; background: transparent; border: none;");
     statusLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(statusLabel);
     buttonLayout = new QHBoxLayout();
-    toggleBtn = new QPushButton("Toggle Bluetooth", bluetoothBox);
-    scanBtn = new QPushButton("Scan for Devices", bluetoothBox);
+    toggleBtn = new QPushButton(Translations::tr("TOGGLE_BLUETOOTH"), bluetoothBox);
+    scanBtn = new QPushButton(Translations::tr("SCAN_DEVICES"), bluetoothBox);
     for (QPushButton* btn : {toggleBtn, scanBtn}) {
         btn->setFixedHeight(40);
         btn->setStyleSheet(
@@ -61,7 +62,7 @@ void Bluetooth::initBluetoothUI() {
     buttonLayout->addWidget(toggleBtn);
     buttonLayout->addWidget(scanBtn);
     mainLayout->addLayout(buttonLayout);
-    listLabel = new QLabel("Available Bluetooth Devices:", bluetoothBox);
+    listLabel = new QLabel(Translations::tr("DEVICES"), bluetoothBox);
     listLabel->setFont(QFont("ElysiaOSNew", 14));
     listLabel->setStyleSheet("color: white; background: transparent; border: none;");
     mainLayout->addWidget(listLabel, 0, Qt::AlignCenter);
@@ -124,17 +125,17 @@ bool Bluetooth::getBluetoothPowerState() {
 
 void Bluetooth::toggleScan() {
     if (scanning) {
-        scanBtn->setText("Scan for Devices");
+        scanBtn->setText(Translations::tr("SCAN_DEVICES"));
         scanning = false;
         return;
     }
-    scanBtn->setText("Scanning...");
+            scanBtn->setText(Translations::tr("SCAN_DEVICES"));
     scanBtn->setEnabled(false);
     scanning = true;
     QProcess::execute("bluetoothctl", QStringList() << "--timeout" << "3" << "scan" << "on");
     QProcess::execute("bluetoothctl", QStringList() << "--timeout" << "2" << "scan" << "off");
     scanning = false;
-    scanBtn->setText("Scan for Devices");
+            scanBtn->setText(Translations::tr("SCAN_DEVICES"));
     scanBtn->setEnabled(true);
     refreshDevices();
 }
@@ -177,7 +178,7 @@ void Bluetooth::refreshDevices() {
                 itemWidget->setStyleSheet("color: white; background: transparent; border: none;");
                 QPushButton *actionBtn = nullptr;
                 if (!isConnected) {
-                    actionBtn = new QPushButton("Connect");
+                    actionBtn = new QPushButton(Translations::tr("CONNECT"));
                     actionBtn->setFixedWidth(100);
                     actionBtn->setStyleSheet(
                         "QPushButton {"
@@ -195,11 +196,11 @@ void Bluetooth::refreshDevices() {
                     connect(actionBtn, &QPushButton::clicked, this, [this, mac]() {
                         QProcess::execute("bluetoothctl", QStringList() << "pair" << mac);
                         QProcess::execute("bluetoothctl", QStringList() << "connect" << mac);
-                        QMessageBox::information(bluetoothBox, "Success", QString("Connected to %1.").arg(mac));
+                        QMessageBox::information(bluetoothBox, Translations::tr("SUCCESS"), QString(Translations::tr("CONNECTED_TO")).arg(mac));
                         refreshDevices();
                     });
                 } else {
-                    actionBtn = new QPushButton("Disconnect");
+                    actionBtn = new QPushButton(Translations::tr("DISCONNECT"));
                     actionBtn->setFixedWidth(100);
                     actionBtn->setStyleSheet(
                         "QPushButton {"
@@ -216,11 +217,11 @@ void Bluetooth::refreshDevices() {
                     );
                     connect(actionBtn, &QPushButton::clicked, this, [this, mac]() {
                         QProcess::execute("bluetoothctl", QStringList() << "disconnect" << mac);
-                        QMessageBox::information(bluetoothBox, "Disconnected", QString("Disconnected from %1.").arg(mac));
+                        QMessageBox::information(bluetoothBox, Translations::tr("DISCONNECTED"), QString(Translations::tr("DISCONNECTED_FROM")).arg(mac));
                         refreshDevices();
                     });
                 }
-                QPushButton *forgetBtn = new QPushButton("Forget");
+                QPushButton *forgetBtn = new QPushButton(Translations::tr("FORGET"));
                 forgetBtn->setFixedWidth(100);
                 forgetBtn->setStyleSheet(
                     "QPushButton {"
@@ -237,7 +238,7 @@ void Bluetooth::refreshDevices() {
                 );
                 connect(forgetBtn, &QPushButton::clicked, this, [this, mac]() {
                     QProcess::execute("bluetoothctl", QStringList() << "remove" << mac);
-                    QMessageBox::information(bluetoothBox, "Removed", QString("Forgot device %1.").arg(mac));
+                    QMessageBox::information(bluetoothBox, Translations::tr("REMOVED"), QString(Translations::tr("FORGOT_DEVICE")).arg(mac));
                     refreshDevices();
                 });
                 itemLayout->addWidget(label);

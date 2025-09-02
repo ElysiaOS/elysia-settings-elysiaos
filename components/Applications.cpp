@@ -1,4 +1,5 @@
 #include "Applications.h"
+#include "../translations.h"
 #include <QDir>
 #include <QFont>
 #include <QProcess>
@@ -28,7 +29,7 @@ Applications::Applications(QObject *parent) : QObject(parent), currentConfigIdx(
         QDir::homePath() + "/.config/hypr/auto_start.conf",
         QDir::homePath() + "/.config/hypr/window_rules.conf"
     };
-    configNames = { "Applications", "Keybinds", "Autoruns", "Window Rules" };
+    configNames = { Translations::tr("APPLICATIONS"), Translations::tr("KEYBINDS"), Translations::tr("AUTORUNS"), Translations::tr("WINDOW_RULES") };
     QWidget *parentWidget = qobject_cast<QWidget*>(parent);
     if (!parentWidget) return;
     initUI();

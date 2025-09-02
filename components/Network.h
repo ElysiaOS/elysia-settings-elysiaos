@@ -15,6 +15,7 @@
 #include <QThread>
 #include <QString>
 #include <QStringList>
+#include "../translations.h"
 
 class WifiScanner : public QThread {
     Q_OBJECT

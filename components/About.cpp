@@ -1,4 +1,5 @@
 #include "About.h"
+#include "../translations.h"
 #include <QDir>
 #include <QFont>
 #include <QPixmap>
@@ -28,7 +29,7 @@ About::About(QObject *parent) : QObject(parent) {
     image->setAlignment(Qt::AlignCenter);
     
     // Title
-    QLabel *title = new QLabel("SYSTEM INFORMATION", aboutBox);
+    QLabel *title = new QLabel(Translations::tr("SYSTEM_INFORMATION"), aboutBox);
     QFont titleFont("ElysiaOSNew", 20, QFont::Bold);
     title->setFont(titleFont);
     title->setStyleSheet("color: white; background: transparent; border: none; margin: 0px; padding: 0px");
@@ -68,7 +69,7 @@ QStringList About::getFastfetchOutput() {
             }
         }
     } else {
-        result.append("Error: Failed to run fastfetch");
+        result.append(Translations::tr("ERROR_FASTFETCH"));
     }
     
     return result;

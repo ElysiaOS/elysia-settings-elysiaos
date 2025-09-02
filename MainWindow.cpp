@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "AnimatedTile.h"
+#include "translations.h"
 #include <QPixmap>
 #include <QFont>
 #include <QIcon>
@@ -25,7 +26,7 @@
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent), themeMode("elysian"), 
     currentView(""), destructionActive(false) {
-    setWindowTitle("Elysia Settings");
+    setWindowTitle(Translations::tr("WINDOW_TITLE"));
     setFixedSize(1600, 800);
     setMouseTracking(true);
 
@@ -61,7 +62,7 @@ void MainWindow::initBackButton() {
     backBtn->move(20, 2);
     connect(backBtn, &QPushButton::clicked, this, &MainWindow::handleBackClick);
 
-    backLabel = new QLabel("BACK", this);
+    backLabel = new QLabel(Translations::tr("BACK"), this);
     QFont font("ElysiaOSNew12", 18, QFont::Bold);
     backLabel->setFont(font);
     backLabel->setStyleSheet("color: white; background: transparent;");
@@ -72,7 +73,7 @@ void MainWindow::initBackButton() {
 }
 
 void MainWindow::initThemeButtons() {
-    themeButtonAmphoreus = new QPushButton("Amphoreus mode", this);
+    themeButtonAmphoreus = new QPushButton(Translations::tr("AMPHOREUS_MODE"), this);
     themeButtonAmphoreus->setGeometry(width() - 250, 20, 200, 40);
     themeButtonAmphoreus->setStyleSheet(
         "QPushButton {"
@@ -87,7 +88,7 @@ void MainWindow::initThemeButtons() {
     );
     connect(themeButtonAmphoreus, &QPushButton::clicked, this, &MainWindow::enableAmphoreusMode);
 
-    themeButtonElysian = new QPushButton("Elysian Realm mode", this);
+    themeButtonElysian = new QPushButton(Translations::tr("ELYSIAN_MODE"), this);
     themeButtonElysian->setGeometry(width() - 250, 20, 200, 40);
     themeButtonElysian->setStyleSheet(
         "QPushButton {"
@@ -106,59 +107,59 @@ void MainWindow::initThemeButtons() {
 
 void MainWindow::initTiles() {
     // Elysian Realm Tiles
-    addTile("elysian", "about.png", "ABOUT", QPoint(750, 240), QPoint(764, 210), 
+    addTile("elysian", "about.png", Translations::tr("ABOUT"), QPoint(750, 240), QPoint(764, 210), 
             [this]() { showAbout(); });
-    addTile("elysian", "display.png", "DISPLAY", QPoint(880, 130), QPoint(885, 115), 
+    addTile("elysian", "display.png", Translations::tr("DISPLAY"), QPoint(880, 130), QPoint(885, 115), 
             [this]() { showDisplay(); });
-    addTile("elysian", "network.png", "NETWORK", QPoint(940, 380), QPoint(930, 370), 
+    addTile("elysian", "network.png", Translations::tr("NETWORK"), QPoint(940, 380), QPoint(930, 370), 
             [this]() { showNetwork(); });
-    addTile("elysian", "update.png", "UPDATES", QPoint(1080, 183), QPoint(1075, 180), 
+    addTile("elysian", "update.png", Translations::tr("UPDATES"), QPoint(1080, 183), QPoint(1075, 180), 
             [this]() { showUpdate(); });
-    addTile("elysian", "snake.png", "STORAGE", QPoint(1195, 340), QPoint(1200, 330), 
+    addTile("elysian", "snake.png", Translations::tr("STORAGE"), QPoint(1195, 340), QPoint(1200, 330), 
             [this]() { showStorage(); });
-    addTile("elysian", "apps.png", "HYPRLAND", QPoint(1290, 162), QPoint(1280, 160), 
+    addTile("elysian", "apps.png", Translations::tr("HYPRLAND"), QPoint(1290, 162), QPoint(1280, 160), 
             [this]() { showApplications(); });
-    addTile("elysian", "support.png", "SUPPORT", QPoint(1340, 410), QPoint(1330, 405), 
+    addTile("elysian", "support.png", Translations::tr("SUPPORT"), QPoint(1340, 410), QPoint(1330, 405), 
             [this]() { showSupport(); });
-    addTile("elysian", "bluetooth.png", "BLUETOOTH", QPoint(630, 95), QPoint(620, 100), 
+    addTile("elysian", "bluetooth.png", Translations::tr("BLUETOOTH"), QPoint(630, 95), QPoint(620, 100), 
             [this]() { showBluetooth(); });
-    addTile("elysian", "sound.png", "SOUND", QPoint(610, 395), QPoint(625, 380), 
+    addTile("elysian", "sound.png", Translations::tr("SOUND"), QPoint(610, 395), QPoint(625, 380), 
             [this]() { showSound(); });
-    addTile("elysian", "power.png", "POWER", QPoint(480, 210), QPoint(495, 205), 
+    addTile("elysian", "power.png", Translations::tr("POWER"), QPoint(480, 210), QPoint(495, 205), 
             [this]() { showPower(); });
-    addTile("elysian", "battery.png", "BATTERY", QPoint(325, 105), QPoint(337, 100), 
+    addTile("elysian", "battery.png", Translations::tr("BATTERY"), QPoint(325, 105), QPoint(337, 100), 
             [this]() { showBattery(); });
-    addTile("elysian", "wallpaper.png", "APPEARANCE", QPoint(366, 355), QPoint(349, 340), 
+    addTile("elysian", "wallpaper.png", Translations::tr("APPEARANCE"), QPoint(366, 355), QPoint(349, 340), 
             [this]() { showWallpaper(); });
-    addTile("elysian", "car.png", "CAR", QPoint(190, 290), QPoint(225, 290), 
+    addTile("elysian", "car.png", Translations::tr("CAR"), QPoint(190, 290), QPoint(225, 290), 
             [this]() { triggerDestruction(); }, true);
 
     // Amphoreus Tiles
     addTile("amphoreus", "about3.png", "", QPoint(1400, 190), QPoint(852, 355), 
             [this]() { showAbout(); });
-    addTile("amphoreus", "display2.png", "DISPLAY", QPoint(320, 595), QPoint(320, 715), 
+    addTile("amphoreus", "display2.png", Translations::tr("DISPLAY"), QPoint(320, 595), QPoint(320, 715), 
             [this]() { showDisplay(); });
-    addTile("amphoreus", "network2.png", "NETWORK", QPoint(320, 395), QPoint(320, 510), 
+    addTile("amphoreus", "network2.png", Translations::tr("NETWORK"), QPoint(320, 395), QPoint(320, 510), 
             [this]() { showNetwork(); });
-    addTile("amphoreus", "update2.png", "UPDATES", QPoint(495, 595), QPoint(495, 715), 
+    addTile("amphoreus", "update2.png", Translations::tr("UPDATES"), QPoint(495, 595), QPoint(495, 715), 
             [this]() { showUpdate(); });
-    addTile("amphoreus", "snake2.png", "STORAGE", QPoint(500, 395), QPoint(500, 510), 
+    addTile("amphoreus", "snake2.png", Translations::tr("STORAGE"), QPoint(500, 395), QPoint(500, 510), 
             [this]() { showStorage(); });
-    addTile("amphoreus", "apps2.png", "HYPRLAND", QPoint(850, 395), QPoint(850, 510), 
+    addTile("amphoreus", "apps2.png", Translations::tr("HYPRLAND"), QPoint(850, 395), QPoint(850, 510), 
             [this]() { showApplications(); });
-    addTile("amphoreus", "support2.png", "SUPPORT", QPoint(1030, 595), QPoint(1030, 715), 
+    addTile("amphoreus", "support2.png", Translations::tr("SUPPORT"), QPoint(1030, 595), QPoint(1030, 715), 
             [this]() { showSupport(); });
-    addTile("amphoreus", "bluetooth2.png", "BLUETOOTH", QPoint(675, 595), QPoint(675, 715), 
+    addTile("amphoreus", "bluetooth2.png", Translations::tr("BLUETOOTH"), QPoint(675, 595), QPoint(675, 715), 
             [this]() { showBluetooth(); });
-    addTile("amphoreus", "sound2.png", "SOUND", QPoint(1030, 395), QPoint(1030, 510), 
+    addTile("amphoreus", "sound2.png", Translations::tr("SOUND"), QPoint(1030, 395), QPoint(1030, 510), 
             [this]() { showSound(); });
-    addTile("amphoreus", "power2.png", "POWER", QPoint(850, 595), QPoint(850, 715), 
+    addTile("amphoreus", "power2.png", Translations::tr("POWER"), QPoint(850, 595), QPoint(850, 715), 
             [this]() { showPower(); });
-    addTile("amphoreus", "battery2.png", "BATTERY", QPoint(675, 395), QPoint(675, 510), 
+    addTile("amphoreus", "battery2.png", Translations::tr("BATTERY"), QPoint(675, 395), QPoint(675, 510), 
             [this]() { showBattery(); });
-    addTile("amphoreus", "wallpaper2.png", "APPEARANCE", QPoint(1210, 395), QPoint(1210, 510), 
+    addTile("amphoreus", "wallpaper2.png", Translations::tr("APPEARANCE"), QPoint(1210, 395), QPoint(1210, 510), 
             [this]() { showWallpaper(); });
-    addTile("amphoreus", "car2.png", "CAR", QPoint(1210, 595), QPoint(1210, 715), 
+    addTile("amphoreus", "car2.png", Translations::tr("CAR"), QPoint(1210, 595), QPoint(1210, 715), 
             [this]() { triggerDestruction(); }, true);
 }
 
@@ -283,7 +284,7 @@ void MainWindow::showUpdate() {
         try {
             QProcess::startDetached("/usr/bin/elysia-updater.sh");
         } catch (...) {
-            QMessageBox::critical(this, "Error", "Failed to run update script");
+            QMessageBox::critical(this, Translations::tr("ERROR_FASTFETCH"), "Failed to run update script");
         }
     }
 }

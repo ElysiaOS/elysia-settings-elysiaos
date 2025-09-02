@@ -11,6 +11,7 @@
 #include <QLineEdit>
 #include <QFileSystemWatcher>
 #include <QDir>
+#include "../translations.h"
 
 class Applications : public QObject {
     Q_OBJECT
