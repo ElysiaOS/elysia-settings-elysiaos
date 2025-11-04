@@ -1,91 +1,156 @@
-#pragma once
-#include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QTimer>
-#include <QVector>
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <gtk/gtk.h>
+#include <string>
+#include <vector>
 #include <memory>
-#include <functional>
-#include "translations.h"
+#include "components/AboutManager.h"
+#include "components/StorageManager.h"
+#include "components/NetworkManager.h"
+#include "components/BluetoothManager.h"
+#include "components/SoundManager.h"
+#include "components/AppearanceManager.h"
+#include "components/BatteryManager.h"
+#include "components/DisplayManager.h"
+#include "components/PowerManager.h"
+#include "components/ApplicationsManager.h"
+#include "components/LanguageManager.h"
+#include "translations/translations.h"
 
-// Include all component headers
-#include "components/About.h"
-#include "components/Applications.h"
-#include "components/Battery.h"
-#include "components/Bluetooth.h"
-#include "components/Display.h"
-#include "components/Network.h"
-#include "components/Power.h"
-#include "components/Sound.h"
-#include "components/Storage.h"
-#include "components/Wallpaper.h"
+struct SettingsTile {
+    std::string name;
+    std::string imagePath;
+    int x, y;
+    int width, height;
+};
 
-class AnimatedTile;
-
-class MainWindow : public QWidget {
-    Q_OBJECT
+class MainWindow {
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    
-    // Public method to launch specific sections from command line
-    void launchSection(const QString &sectionName);
-
-private slots:
-    void handleBackClick();
-    void enableAmphoreusMode();
-    void enableElysianMode();
-    void triggerDestruction();
-    void closeApplication();
-    
-    // Section show methods
-    void showAbout();
-    void showDisplay();
-    void showNetwork();
-    void showSound();
-    void showApplications();
-    void showWallpaper();
-    void showBluetooth();
-    void showBattery();
-    void showPower();
-    void showStorage();
-    void showSupport();
-    void showUpdate();
+    MainWindow(GtkApplication* app);
+    MainWindow(GtkApplication* app, const std::string& section);
+    ~MainWindow();
+    void show();
+    void showMainMenu();
+    void hideMainMenu();
+    void switchToBackground(const std::string& backgroundName);
+    void openSection(const std::string& section);
 
 private:
-    void initBackButton();
-    void initThemeButtons();
-    void initTiles();
-    void updateTileVisibility();
-    void showSection(const QString &name);
-    void hideTiles();
-    void showTiles();
-    void showBackButton();
-    void hideBackButton();
+    GtkWidget* window;
+    GtkWidget* overlay;
+    GtkWidget* fixed;
+    GtkWidget* background;
+    GtkWidget* exitButton;
+    GtkWidget* themeButton;
+    GtkWidget* hoverInfoOverlay;
+    std::string currentBackground;
+    std::vector<SettingsTile> tiles;
+    std::vector<GtkWidget*> tileWidgets;
     
-    void addTile(const QString &theme, const QString &img, const QString &text, 
-                 const QPoint &tilePos, const QPoint &labelPos, 
-                 std::function<void()> handler = nullptr, bool isCar = false);
+    // Theme state
+    enum class Theme { ElysianRealm, Amphoreus };
+    Theme currentTheme;
+    AboutManager* aboutManager;
+    StorageManager* storageManager;
+    NetworkManager* networkManager;
+    BluetoothManager* bluetoothManager;
+    SoundManager* soundManager;
+    AppearanceManager* appearanceManager;
+    BatteryManager* batteryManager;
+    DisplayManager* displayManager;
+    PowerManager* powerManager;
+    ApplicationsManager* applicationsManager;
+    LanguageManager* languageManager;
+    
+    void setupWindow();
+    void loadBackground();
+    void setupTiles();
+    void setupExitButton();
+    void setupThemeButton();
+    void createTile(const SettingsTile& tile, const std::pair<int, int>& labelPosition);
+    void setupThemeData();
+    void switchTheme();
+    void rebuildForTheme();
+    void setupElysianRealmTheme();
+    void setupAmphoreusTheme();
+    
+    // Event handlers
+    static void onTileClicked(GtkGestureClick* gesture, int n_press, double x, double y, gpointer data);
+    static void onTileEnter(GtkEventControllerMotion* controller, double x, double y, gpointer data);
+    static void onTileLeave(GtkEventControllerMotion* controller, gpointer data);
+    static void onExitButtonClicked(GtkButton* button, gpointer user_data);
+    static void onThemeButtonClicked(GtkButton* button, gpointer user_data);
+    
+    // Utility functions
+    std::string getAssetPath(const std::string& filename);
+    void initializeTranslations();
+    void showHoverInfo(const std::string& tileName);
+    void hideHoverInfo();
+    Theme getInitialTheme();
 
-    QLabel *bgLabel;
-    QPushButton *backBtn;
-    QLabel *backLabel;
-    QPushButton *themeButtonAmphoreus;
-    QPushButton *themeButtonElysian;
+    // Shatter effect
+    struct ShatterFragment {
+        GtkWidget* widget;
+        double startX, startY;
+        double targetX, targetY;
+        double rotation;
+        double rotationSpeed;
+        double velocityX, velocityY;
+        double gravity;
+        guint64 startTime;
+    };
     
-    QString themeMode;
-    QString currentView;
-    bool destructionActive;
-    QVector<AnimatedTile*> tiles;
+    class ShatterEffect {
+    public:
+        ShatterEffect(MainWindow* mainWindow, GtkWidget* tileWidget, const SettingsTile& tile);
+        ~ShatterEffect();
+        void startShatter();
+        
+    private:
+        MainWindow* mainWindow;
+        GtkWidget* originalTile;
+        SettingsTile tileData;
+        std::vector<ShatterFragment> fragments;
+        guint animationTimeoutId;
+        guint64 effectStartTime;
+        
+        void createFragments();
+        static gboolean animateFragments(gpointer user_data);
+        void cleanupEffect();
+    };
     
-    // Component managers
-    std::unique_ptr<About> aboutManager;
-    std::unique_ptr<Applications> applicationsManager;
-    std::unique_ptr<Battery> batteryManager;
-    std::unique_ptr<Bluetooth> bluetoothManager;
-    std::unique_ptr<DisplayManager> displayManager;
-    std::unique_ptr<Network> networkManager;
-    std::unique_ptr<Power> powerManager;
-    std::unique_ptr<Sound> soundManager;
-    std::unique_ptr<Storage> storageManager;
-    std::unique_ptr<Wallpaper> wallpaperManager;
+    std::unique_ptr<ShatterEffect> currentShatterEffect;
+    bool isAnimating;
+    
+    // Bouncing animation
+    struct BouncingTile {
+        GtkWidget* widget;
+        int baseX, baseY;
+        double bounceOffset;
+        int bounceDir;
+        guint bounceTimerId;
+    };
+    std::vector<BouncingTile> bouncingTiles;
+    
+    // Image bouncing animation (separate from position bouncing)
+    struct ImageBouncingTile {
+        GtkWidget* widget;
+        double scaleOffset;
+        int scaleDir;
+        guint imageBounceTimerId;
+    };
+    std::vector<ImageBouncingTile> imageBouncingTiles;
+    
+    // Bouncing animation methods
+    static gboolean updateBounceAnimation(gpointer user_data);
+    void startBounceAnimation(GtkWidget* tileWidget, int baseX, int baseY);
+    void stopBounceAnimation(GtkWidget* tileWidget);
+    
+    // Image bouncing animation methods
+    static gboolean updateImageBounceAnimation(gpointer user_data);
+    void startImageBounceAnimation(GtkWidget* tileWidget);
+    void stopImageBounceAnimation(GtkWidget* tileWidget);
 };
+
+#endif // MAINWINDOW_H
